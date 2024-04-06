@@ -31,7 +31,17 @@ class LocationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $location = $request->validate(
+            [
+                'name' => ['required', 'string', 'max:25'],
+                'description' => ['required', 'string', 'max:144'],
+                'rating' => ['required', 'numeric', 'digits_between:1,5'],
+            ]);
+
+        $location['_fk_user'] = 1;
+        $location = Location::query()->create($location);
+        return to_route('location.show', $location)
+            ->with('message', 'Location created successfully.');
     }
 
     /**
@@ -55,7 +65,16 @@ class LocationController extends Controller
      */
     public function update(Request $request, Location $location)
     {
-        //
+        $request = $request->validate(
+            [
+                'name' => ['required', 'string', 'max:25'],
+                'description' => ['required', 'string', 'max:144'],
+                'rating' => ['required', 'numeric', 'digits_between:1,5'],
+            ]);
+
+        $location->update($request);
+        return to_route('location.show', $location)
+            ->with('message', 'Location updated successfully.');
     }
 
     /**
@@ -63,6 +82,8 @@ class LocationController extends Controller
      */
     public function destroy(Location $location)
     {
-        //
+        $location->delete();
+        return to_route('location.index')
+            ->with('message', 'Location deleted successfully.');
     }
 }
