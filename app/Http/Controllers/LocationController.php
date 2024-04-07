@@ -15,7 +15,7 @@ class LocationController extends Controller
     {
         $locations = Location::query()
             ->orderBy('created_at', 'desc')
-            ->paginate(2);
+            ->paginate(5);
         return view('location.index', compact('locations'));
     }
 
@@ -50,9 +50,6 @@ class LocationController extends Controller
      */
     public function show(Location $location)
     {
-        if ($location->getAttribute('_fk_user') != Auth::id()) {
-            abort(403);
-        }
         return view('location.show', compact('location'));
     }
 
@@ -61,6 +58,9 @@ class LocationController extends Controller
      */
     public function edit(Location $location)
     {
+        if (!$this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
+            abort(403);
+        }
         return view('location.edit', compact('location'));
     }
 
@@ -69,6 +69,10 @@ class LocationController extends Controller
      */
     public function update(Request $request, Location $location)
     {
+        if (!$this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
+            abort(403);
+        }
+
         $request = $request->validate(
             [
                 'name' => ['required', 'string', 'max:25'],
@@ -86,8 +90,16 @@ class LocationController extends Controller
      */
     public function destroy(Location $location)
     {
+        if (!$this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
+            abort(403);
+        }
         $location->delete();
         return to_route('location.index')
             ->with('message', 'Location deleted successfully.');
+    }
+
+    public function isUserAuthenticated(int $fkUser): bool
+    {
+        return $fkUser == Auth::id();
     }
 }
