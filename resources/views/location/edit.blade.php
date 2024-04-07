@@ -1,4 +1,4 @@
-<x-layout>
+<x-app-layout>
     <div class="location-container single-location">
         <h1 class="text-3xl py-4">Edit your location</h1>
         <form action="{{ route('location.update', $location) }}" method="POST" class="location">
@@ -28,4 +28,4 @@
             </div>
         </form>
     </div>
-</x-layout>
+</x-app-layout>

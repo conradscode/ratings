@@ -1,4 +1,4 @@
-<x-layout>
+<x-app-layout>
     <div class="location-container single-location">
         <div class="location-header">
             <h1 class="text-3xl py-4">Location: {{ $location->created_at }}</h1>
@@ -17,4 +17,5 @@
             </div>
         </div>
     </div>
-</x-layout>
+</x-app-layout>
+

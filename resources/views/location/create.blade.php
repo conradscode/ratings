@@ -1,4 +1,4 @@
-<x-layout>
+<x-app-layout>
     <div class="location-container single-location">
         <h1>Create new location</h1>
         <form action="{{ route('location.store') }}" method="POST" class="location">
@@ -23,4 +23,4 @@
             </div>
         </form>
     </div>
-</x-layout>
+</x-app-layout>

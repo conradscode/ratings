@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LocationController extends Controller
 {
@@ -38,7 +39,7 @@ class LocationController extends Controller
                 'rating' => ['required', 'numeric', 'digits_between:1,5'],
             ]);
 
-        $location['_fk_user'] = 1;
+        $location['_fk_user'] = Auth::id();
         $location = Location::query()->create($location);
         return to_route('location.show', $location)
             ->with('message', 'Location created successfully.');
@@ -49,6 +50,9 @@ class LocationController extends Controller
      */
     public function show(Location $location)
     {
+        if ($location->getAttribute('_fk_user') != Auth::id()) {
+            abort(403);
+        }
         return view('location.show', compact('location'));
     }
 
