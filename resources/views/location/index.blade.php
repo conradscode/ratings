@@ -16,8 +16,11 @@
                     @endif
                     <a href="{{ route('location.show', $location) }}"
                        class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">View</a>
-                    <a href="{{ route('likes.store', ['locationId' => $location->id]) }}"
-                       class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">Like</a>
+                    <form action="{{ route('likes.store', ['locationId' => $location->id]) }}" method="POST">
+                        @csrf
+                        @method('POST')
+                        <button class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">Like</button>
+                    </form>
                 </div>
             </div>
         @endforeach
