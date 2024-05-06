@@ -16,6 +16,8 @@
                     @endif
                     <a href="{{ route('location.show', $location) }}"
                        class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">View</a>
+                    <a href="{{ route('likes.store', ['locationId' => $location->id]) }}"
+                       class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">Like</a>
                 </div>
             </div>
         @endforeach
