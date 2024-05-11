@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Like;
 use App\Models\Location;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,19 +20,9 @@ class LocationController extends Controller
             ->paginate(5);
 
         foreach ($locations as $location) {
-            $location->likes = Like::query()
-                ->where([
-                    '_fk_location' => $location->id,
-                    'like_active' => Like::LIKE_ACTIVE
-                ])
-                ->count();
-
-            $location->like_active = Like::query()
-                ->where([
-                    '_fk_location' => $location->id,
-                    '_fk_user' => Auth::id(),
-                ])
-                ->value('like_active');
+            $likes = $this->getLikesForLocation($location->id);
+            $location->likes = $likes->where('like_active', 1)->count();
+            $location->like_active = $likes->where('_fk_user', Auth::id())->value('like_active');
         }
 
         return view('location.index', compact('locations'));
@@ -113,7 +104,16 @@ class LocationController extends Controller
         return to_route('location.index')
             ->with('message', 'Location deleted successfully.');
     }
-    
+
+    public function getLikesForLocation(int $locationId): Collection
+    {
+        return Like::query()
+            ->select(['_fk_user', 'like_active'])
+            ->where([
+                '_fk_location' => $locationId
+            ])
+            ->get();
+    }
 
     public function isUserAuthenticated(int $fkUser): bool
     {
