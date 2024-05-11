@@ -3,36 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Like;
+use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
 {
-    const LIKE_ACTIVE = 1;
-
-    public function index(int $locationId): int
-    {
-        return Like::query()
-            ->where(
-                [
-                    '_fk_location' => $locationId,
-                    'like_active' => self::LIKE_ACTIVE
-                ]
-            )
-            ->count();
-    }
-
-    public function show(int $locationId): int
-    {
-        return Like::query()
-            ->where(
-                [
-                    '_fk_location' => $locationId,
-                    '_fk_user' => auth()->id(),
-                    'like_active' => self::LIKE_ACTIVE
-                ]
-            )
-            ->count();
-    }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -40,9 +14,29 @@ class LikeController extends Controller
     {
         Like::query()
             ->where('_fk_location', $locationId)
-            ->updateOrInsert([
+            ->insert([
                 '_fk_location' => $locationId,
-                '_fk_user' => auth()->id(),
+                '_fk_user' => Auth::id(),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+        return to_route('location.index');
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(int $locationId, int $likeActive)
+    {
+        Like::query()
+            ->where([
+                '_fk_location' => $locationId,
+                '_fk_user' => Auth::id(),
+            ])
+            ->update([
+                'like_active' => $likeActive,
+                'updated_at'  => now()
             ]);
 
         return to_route('location.index');
