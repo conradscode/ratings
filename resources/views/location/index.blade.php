@@ -16,11 +16,37 @@
                     @endif
                     <a href="{{ route('location.show', $location) }}"
                        class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">View</a>
-                    <form action="{{ route('likes.store', ['locationId' => $location->id]) }}" method="POST">
-                        @csrf
-                        @method('POST')
-                        <button class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">Like</button>
-                    </form>
+                    @if(isset($location->like_active))
+                        <form action="{{ route('likes.update',
+                              [
+                                  'locationId' => $location->id,
+                                  'likeActive' => $location->like_active ? 0 : 1
+                              ]) }}"
+                              method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">
+                                @if($location->like_active == 1)
+                                    Unlike
+                                @else
+                                    Like
+                                @endif
+                            </button>
+                        </form>
+                    @else
+                        <form action="{{ route('likes.store', ['locationId' => $location->id]) }}" method="POST">
+                            @csrf
+                            @method('POST')
+                            <button class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">Like</button>
+                        </form>
+                    @endif
+                    <div class="p-2">
+                        {{$location->likes}} @if($location->likes > 1 || $location->likes < 1)
+                            Likes
+                        @else
+                            Like
+                        @endif
+                    </div>
                 </div>
             </div>
         @endforeach
@@ -28,7 +54,7 @@
     </div>
     <div class="flex flex-row-reverse pb-6 p-4">
         <a href="{{ route('location.create') }}" class="bg-sky-500 text-white font-bold py-2 p-4 rounded-full">
-            New location
+            Create new location
         </a>
     </div>
     {{ $locations->links() }}

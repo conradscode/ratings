@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Like;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,23 @@ class LocationController extends Controller
         $locations = Location::query()
             ->orderBy('created_at', 'desc')
             ->paginate(5);
+
+        foreach ($locations as $location) {
+            $location->likes = Like::query()
+                ->where([
+                    '_fk_location' => $location->id,
+                    'like_active' => Like::LIKE_ACTIVE
+                ])
+                ->count();
+
+            $location->like_active = Like::query()
+                ->where([
+                    '_fk_location' => $location->id,
+                    '_fk_user' => Auth::id(),
+                ])
+                ->value('like_active');
+        }
+
         return view('location.index', compact('locations'));
     }
 
@@ -32,12 +50,11 @@ class LocationController extends Controller
      */
     public function store(Request $request)
     {
-        $location = $request->validate(
-            [
-                'name' => ['required', 'string', 'max:25'],
-                'description' => ['required', 'string', 'max:144'],
-                'rating' => ['required', 'numeric', 'digits_between:1,5'],
-            ]);
+        $location = $request->validate([
+            'name' => ['required', 'string', 'max:25'],
+            'description' => ['required', 'string', 'max:144'],
+            'rating' => ['required', 'numeric', 'digits_between:1,5'],
+        ]);
 
         $location['_fk_user'] = Auth::id();
         $location = Location::query()->create($location);
@@ -73,12 +90,11 @@ class LocationController extends Controller
             abort(403);
         }
 
-        $request = $request->validate(
-            [
-                'name' => ['required', 'string', 'max:25'],
-                'description' => ['required', 'string', 'max:144'],
-                'rating' => ['required', 'numeric', 'digits_between:1,5'],
-            ]);
+        $request = $request->validate([
+            'name' => ['required', 'string', 'max:25'],
+            'description' => ['required', 'string', 'max:144'],
+            'rating' => ['required', 'numeric', 'digits_between:1,5'],
+        ]);
 
         $location->update($request);
         return to_route('location.show', $location)
@@ -97,6 +113,7 @@ class LocationController extends Controller
         return to_route('location.index')
             ->with('message', 'Location deleted successfully.');
     }
+    
 
     public function isUserAuthenticated(int $fkUser): bool
     {
