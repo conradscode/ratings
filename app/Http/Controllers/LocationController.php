@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Like;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,7 +22,7 @@ class LocationController extends Controller
 
         foreach ($locations as $location) {
             $likes = $this->getLikesForLocation($location->id);
-            $location->likes = $likes->where('like_active', 1)->count();
+            $location->likes = $likes->where('like_active', Like::LIKE_ACTIVE)->count();
             $location->like_active = $likes->where('_fk_user', Auth::id())->value('like_active');
         }
 
@@ -75,7 +76,7 @@ class LocationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Location $location)
+    public function update(Request $request, Location $location): RedirectResponse
     {
         if (!$this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
             abort(403);
@@ -95,7 +96,7 @@ class LocationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Location $location)
+    public function destroy(Location $location): RedirectResponse
     {
         if (!$this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
             abort(403);

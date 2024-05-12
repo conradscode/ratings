@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Like;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
@@ -10,7 +11,7 @@ class LikeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(int $locationId)
+    public function store(int $locationId): RedirectResponse
     {
         Like::query()
             ->where('_fk_location', $locationId)
@@ -27,7 +28,7 @@ class LikeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(int $locationId, int $likeActive)
+    public function update(int $locationId, int $likeActive): RedirectResponse
     {
         Like::query()
             ->where([
