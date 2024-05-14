@@ -34,5 +34,4 @@ jobs:
         DB_DATABASE: database/database.sqlite
       run: php artisan test
     - name: Show logs
-      run: |
-        tail -n 500 storage/logs/laravel.log
+      run: tail -n 500 storage/logs/laravel.log
