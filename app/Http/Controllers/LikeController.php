@@ -13,6 +13,10 @@ class LikeController extends Controller
      */
     public function store(int $locationId): RedirectResponse
     {
+        if ($this->likeExists($locationId)) {
+            return to_route('location.index');
+        }
+
         Like::query()
             ->where('_fk_location', $locationId)
             ->insert([
@@ -41,5 +45,15 @@ class LikeController extends Controller
             ]);
 
         return to_route('location.index');
+    }
+
+    public function likeExists(int $locationId): bool
+    {
+        return Like::query()
+            ->where([
+                '_fk_location' => $locationId,
+                '_fk_user' => Auth::id(),
+            ])
+            ->exists();
     }
 }
