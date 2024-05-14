@@ -12,7 +12,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::controller(LikeController::class)->group(function () {
-    Route::get('/likes/{locationId}', 'show');
     Route::post('/likes/{locationId}', 'store')->name('likes.store');
     Route::patch('/likes/{locationId}/{likeActive}', 'update')->name('likes.update');
 });

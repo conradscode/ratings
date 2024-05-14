@@ -14,6 +14,7 @@ class LikeTest extends TestCase
     use RefreshDatabase;
     const LOCATION_ID = 3;
     const LOCATION_TWO_ID = 55;
+    const LOCATION_THREE_ID = 3030;
     const USER_ID = 1;
 
     private User $user;
@@ -33,6 +34,8 @@ class LikeTest extends TestCase
 
         $this->createLocation(self::LOCATION_TWO_ID, self::USER_ID);
         $this->createLike(self::LOCATION_TWO_ID, self::USER_ID, 0);
+
+        $this->createLocation(self::LOCATION_THREE_ID, self::USER_ID);
     }
 
     public function test_like_can_be_made_inactive(): void
@@ -79,6 +82,42 @@ class LikeTest extends TestCase
         });
     }
 
+    public function test_like_can_be_created(): void
+    {
+        $response = $this
+            ->actingAs($this->user)
+            ->from('/location')
+            ->post('/likes/'.self::LOCATION_THREE_ID);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/location');
+
+        $this->assertDatabaseHas('likes', [
+            '_fk_user' => self::USER_ID,
+            '_fk_location' => self::LOCATION_THREE_ID,
+            'like_active' => 1,
+        ]);
+    }
+
+    public function test_like_isnt_created_if_it_already_exists(): void
+    {
+        $response = $this
+            ->actingAs($this->user)
+            ->from('/location')
+            ->post('/likes/'.self::LOCATION_TWO_ID);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/location');
+
+        $this->assertDatabaseMissing('likes', [
+            '_fk_user' => self::USER_ID,
+            '_fk_location' => self::LOCATION_TWO_ID,
+            'like_active' => 1,
+        ]);
+    }
+
     public function createLocation(int $locationId, $userId): void
     {
         Location::factory()->create([
@@ -95,7 +134,6 @@ class LikeTest extends TestCase
     public function createLike(int $locationId, int $userId, int $likeActive): void
     {
         Like::factory()->create([
-            'id' => fake()->randomDigitNotNull(),
             '_fk_user' => $userId,
             '_fk_location' => $locationId,
             'like_active' => $likeActive,
