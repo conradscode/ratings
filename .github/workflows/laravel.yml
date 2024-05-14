@@ -33,3 +33,6 @@ jobs:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
       run: php artisan test
+    - name: Show logs
+      run: |
+        tail -n 500 storage/logs/laravel.log
