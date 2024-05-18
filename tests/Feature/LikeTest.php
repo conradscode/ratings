@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Likes;
+namespace Tests\Feature;
 
 use App\Models\Like;
 use App\Models\Location;
