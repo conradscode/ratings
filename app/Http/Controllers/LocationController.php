@@ -21,9 +21,8 @@ class LocationController extends Controller
             ->paginate(5);
 
         foreach ($locations as $location) {
-            $likes = $this->getLikesForLocation($location->id);
-            $location->likes = $likes->where('like_active', Like::LIKE_ACTIVE)->count();
-            $location->like_active = $likes->where('_fk_user', Auth::id())->value('like_active');
+            $location->likes = $this->getLikesCount($location->id);
+            $location->like_active = $this->getLikeActive($location->id);
         }
 
         return view('location.index', compact('locations'));
@@ -106,14 +105,25 @@ class LocationController extends Controller
             ->with('message', 'Location deleted successfully.');
     }
 
-    public function getLikesForLocation(int $locationId): Collection
+    public function getLikesCount(int $locationId): int
     {
         return Like::query()
-            ->select(['_fk_user', 'like_active'])
             ->where([
-                '_fk_location' => $locationId
+                '_fk_location' => $locationId,
+                'like_active' => Like::LIKE_ACTIVE
             ])
-            ->get();
+            ->count();
+    }
+
+    public function getLikeActive(int $locationId)
+    {
+        return Like::query()
+            ->select('like_active')
+            ->where([
+                '_fk_location' => $locationId,
+                '_fk_user' => Auth::id()
+            ])
+            ->rawValue('like_active');
     }
 
     public function isUserAuthenticated(int $fkUser): bool
