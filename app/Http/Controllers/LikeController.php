@@ -56,4 +56,25 @@ class LikeController extends Controller
             ])
             ->exists();
     }
+
+    public function getLikesCount(int $locationId): int
+    {
+        return Like::query()
+            ->where([
+                '_fk_location' => $locationId,
+                'like_active' => Like::LIKE_ACTIVE
+            ])
+            ->count();
+    }
+
+    public function getLikeActive(int $locationId)
+    {
+        return Like::query()
+            ->select('like_active')
+            ->where([
+                '_fk_location' => $locationId,
+                '_fk_user' => Auth::id()
+            ])
+            ->rawValue('like_active');
+    }
 }
