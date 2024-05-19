@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\LikeController;
 use App\Models\Like;
 use App\Models\Location;
 use App\Models\User;
@@ -18,10 +19,12 @@ class LikeTest extends TestCase
     const USER_ID = 1;
 
     private User $user;
+    private LikeController $likeController;
 
     public function setUp(): void
     {
         parent::setUp();
+        $this->likeController = new LikeController();
         $this->user = User::factory()->create([
             'id' => self::USER_ID,
             'name' => 'Test User',
@@ -36,6 +39,40 @@ class LikeTest extends TestCase
         $this->createLike(self::LOCATION_TWO_ID, self::USER_ID, 0);
 
         $this->createLocation(self::LOCATION_THREE_ID, self::USER_ID);
+    }
+
+    public function test_like_exists_returns_true_if_like_found(): void
+    {
+        $this->actingAs($this->user);
+        $this->assertTrue($this->likeController->likeExists(self::LOCATION_ID));
+    }
+
+    public function test_like_exists_returns_false_if_no_like_found(): void
+    {
+        $this->assertFalse($this->likeController->likeExists(self::LOCATION_THREE_ID));
+    }
+
+    public function test_likes_count_returns_active_likes(): void
+    {
+        $this->assertEquals(1, $this->likeController->getLikesCount(self::LOCATION_ID));
+    }
+
+    public function test_likes_count_doesnt_return_inactive_likes(): void
+    {
+        $this->actingAs($this->user);
+        $this->assertEquals(0, $this->likeController->getLikesCount(self::LOCATION_TWO_ID));
+    }
+
+    public function test_get_like_active_returns_true(): void
+    {
+        $this->actingAs($this->user);
+        $this->assertEquals(1, $this->likeController->getLikeActive(self::LOCATION_ID));
+    }
+
+    public function test_get_like_active_returns_false(): void
+    {
+        $this->actingAs($this->user);
+        $this->assertEquals(0, $this->likeController->getLikeActive(self::LOCATION_TWO_ID));
     }
 
     public function test_like_can_be_made_inactive(): void
@@ -116,6 +153,7 @@ class LikeTest extends TestCase
             '_fk_location' => self::LOCATION_TWO_ID,
             'like_active' => 1,
         ]);
+
     }
 
     public function createLocation(int $locationId, $userId): void
