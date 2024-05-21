@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Like;
 use App\Models\Location;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -94,8 +93,7 @@ class LocationController extends Controller
         ]);
 
         $location->update($request);
-        return to_route('location.show', $location)
-            ->with('message', 'Location updated successfully.');
+        return to_route('location.show', $location);
     }
 
     /**
