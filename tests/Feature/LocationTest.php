@@ -21,6 +21,7 @@ class LocationTest extends TestCase
         'description' => 'Test Location Description',
         'rating' => 2,
     ];
+    const LOCATION_ID_FOR_TESTS = 3993;
 
     private User $user;
 
@@ -74,7 +75,7 @@ class LocationTest extends TestCase
 
     public function test_shows_correct_location(): void
     {
-        $location = $this->createLocation(3993, self::USER_ID);
+        $location = $this->createLocation(self::LOCATION_ID_FOR_TESTS, self::USER_ID);
         $response = $this
             ->actingAs($this->user)
             ->get('/location/' . $location->id);
@@ -85,24 +86,83 @@ class LocationTest extends TestCase
         $response->assertSee($location->rating);
     }
 
-    public function test_edit_does_not_load_if_user_not_authenticated(): void
+    public function test_edit_does_not_load_if_correct_user_not_authenticated(): void
     {
         $response = $this
-            ->get('/location' . self::LOCATION_ID . '/edit');
+            ->actingAs(User::factory()->create())
+            ->get('/location/' . self::LOCATION_ID . '/edit');
         $response->assertStatus(403);
     }
 
     public function test_edit_shows_correct_location(): void
     {
-        $location = $this->createLocation(3993, self::USER_ID);
+        $location = $this->createLocation(self::LOCATION_ID_FOR_TESTS, self::USER_ID);
 
         $response = $this
             ->actingAs($this->user)
-            ->put('/location' . $location->id);
+            ->get('/location/' . $location->id . '/edit');
         $response->assertStatus(200);
         $response->assertSee($location->name);
         $response->assertSee($location->description);
         $response->assertSee($location->rating);
+    }
+
+    public function test_update_aborts_if_correct_user_not_authenticated(): void
+    {
+        $location = $this->createLocation(self::LOCATION_ID_FOR_TESTS, self::USER_ID);
+
+        $response = $this
+            ->actingAs(User::factory()->create())
+            ->put(route('location.update', $location), self::TEST_STORE_LOCATION_DETAILS);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_update_changes_record_in_database(): void
+    {
+        $location = $this->createLocation(self::LOCATION_ID_FOR_TESTS, self::USER_ID);
+
+        $response = $this
+            ->actingAs($this->user)
+            ->put(route('location.update', $location), self::TEST_STORE_LOCATION_DETAILS);
+
+        $response->assertRedirect('/location/' . self::LOCATION_ID_FOR_TESTS);
+        $response->assertStatus(302);
+
+        $this->assertDatabaseHas('locations',
+            [
+                'id' => self::LOCATION_ID_FOR_TESTS,
+                '_fk_user' => self::USER_ID,
+                ...self::TEST_STORE_LOCATION_DETAILS
+            ]);
+    }
+
+    public function test_destroy_aborts_if_correct_user_not_authenticated(): void
+    {
+        $location = $this->createLocation(self::LOCATION_ID_FOR_TESTS, self::USER_ID);
+
+        $response = $this
+            ->actingAs(User::factory()->create())
+            ->delete(route('location.destroy', $location));
+
+        $response->assertStatus(403);
+    }
+
+    public function test_destroy_removes_record_from_database(): void
+    {
+        $location = $this->createLocation(self::LOCATION_ID_FOR_TESTS, self::USER_ID);
+
+        $response = $this
+            ->actingAs($this->user)
+            ->delete(route('location.destroy', $location));
+
+        $response->assertStatus(302);
+
+        $this->assertDatabaseMissing('locations',
+            [
+                'id' => self::LOCATION_ID_FOR_TESTS,
+                '_fk_user' => self::USER_ID,
+            ]);
     }
 
 

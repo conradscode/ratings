@@ -93,8 +93,7 @@ class LocationController extends Controller
         ]);
 
         $location->update($request);
-        return to_route('location.show', $location)
-            ->with('message', 'Location updated successfully.');
+        return to_route('location.show', $location);
     }
 
     /**
