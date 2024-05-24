@@ -24,6 +24,17 @@ class EmailVerificationTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_user_is_redirected_if_email_is_verified(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => '2024-05-12 07:05:00',
+        ]);
+
+        $response = $this->actingAs($user)->get('/verify-email');
+
+        $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
     public function test_email_can_be_verified(): void
     {
         $user = User::factory()->create([
