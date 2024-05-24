@@ -5,7 +5,9 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
@@ -62,8 +64,6 @@ class EmailVerificationTest extends TestCase
             'email_verified_at' => '2024-05-12 07:05:00',
         ]);
 
-        Event::fake();
-
         $verificationUrl = URL::temporarySignedRoute(
             'verification.verify',
             now()->addMinutes(60),
@@ -90,5 +90,27 @@ class EmailVerificationTest extends TestCase
         $this->actingAs($user)->get($verificationUrl);
 
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
+    }
+
+    public function test_user_is_redirected_if_email_is_already_verified(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => '2024-05-12 07:05:00',
+        ]);
+
+        $response = $this->actingAs($user)->post('email/verification-notification');
+
+        $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_email_verification_redirects(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => null,
+        ]);
+
+        $response = $this->actingAs($user)->post('email/verification-notification');
+
+        $response->assertRedirect('/');
     }
 }
