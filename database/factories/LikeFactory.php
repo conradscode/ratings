@@ -20,7 +20,6 @@ class LikeFactory extends Factory
         return [
             '_fk_user' => fake()->numberBetween(1, 10),
             '_fk_location' => fake()->numberBetween(1, 10),
-            'like_active' => fake()->boolean,
         ];
     }
 }
