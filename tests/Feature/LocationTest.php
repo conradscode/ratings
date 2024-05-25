@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Like;
 use App\Models\Location;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -158,6 +159,32 @@ class LocationTest extends TestCase
                 'id' => self::LOCATION_ID_FOR_TESTS,
                 '_fk_user' => self::USER_ID,
             ]);
+    }
+
+    public function test_destroy_removes_location_likes_from_database(): void
+    {
+        $location = $this->createLocation(self::LOCATION_ID_FOR_TESTS, self::USER_ID);
+        Like::factory()->create([
+            '_fk_location' => self::LOCATION_ID_FOR_TESTS,
+            '_fk_user' => self::USER_ID
+        ]);
+        $response = $this
+            ->actingAs($this->user)
+            ->delete(route('location.destroy', $location));
+
+        $response->assertStatus(302);
+
+        $this->assertDatabaseMissing('likes',
+            [
+                '_fk_location' => self::LOCATION_ID_FOR_TESTS,
+                '_fk_user' => self::USER_ID
+            ]);
+        $this->assertDatabaseMissing('locations',
+            [
+                'id' => self::LOCATION_ID_FOR_TESTS,
+                '_fk_user' => self::USER_ID,
+            ]);
+
     }
 
     public function createLocation(int $locationId, $userId): Location
