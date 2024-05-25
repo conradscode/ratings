@@ -58,4 +58,11 @@ class LikeController extends Controller
             ->where('_fk_location', $locationId)
             ->count();
     }
+
+    public function deleteAllLikes(int $locationId): void
+    {
+        Like::query()
+            ->where('_fk_location', $locationId)
+            ->delete();
+    }
 }
