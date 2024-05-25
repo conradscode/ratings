@@ -13,7 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::controller(LikeController::class)->group(function () {
     Route::post('/likes/{locationId}', 'store')->name('likes.store');
-    Route::patch('/likes/{locationId}/{likeActive}', 'update')->name('likes.update');
+    Route::delete('/likes/{locationId}', 'destroy')->name('likes.destroy');
 });
 
 Route::middleware('auth')->group(function () {

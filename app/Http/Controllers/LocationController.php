@@ -27,7 +27,7 @@ class LocationController extends Controller
 
         foreach ($locations as $location) {
             $location->likes = $this->likeController->getLikesCount($location->id);
-            $location->like_active = $this->likeController->getLikeActive($location->id);
+            $location->liked_by_current_user = $this->likeController->likeExists($location->id);
         }
 
         return view('location.index', compact('locations'));

@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
 {
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(int $locationId): RedirectResponse
     {
         if ($this->likeExists($locationId)) {
@@ -29,20 +26,18 @@ class LikeController extends Controller
         return to_route('location.index');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(int $locationId, int $likeActive): RedirectResponse
+    public function destroy(int $locationId): RedirectResponse
     {
+        if (!$this->likeExists($locationId)) {
+            return to_route('location.index');
+        }
+
         Like::query()
             ->where([
                 '_fk_location' => $locationId,
                 '_fk_user' => Auth::id(),
             ])
-            ->update([
-                'like_active' => $likeActive,
-                'updated_at'  => now()
-            ]);
+            ->delete();
 
         return to_route('location.index');
     }
@@ -60,21 +55,7 @@ class LikeController extends Controller
     public function getLikesCount(int $locationId): int
     {
         return Like::query()
-            ->where([
-                '_fk_location' => $locationId,
-                'like_active' => Like::LIKE_ACTIVE
-            ])
+            ->where('_fk_location', $locationId)
             ->count();
-    }
-
-    public function getLikeActive(int $locationId)
-    {
-        return Like::query()
-            ->select('like_active')
-            ->where([
-                '_fk_location' => $locationId,
-                '_fk_user' => Auth::id()
-            ])
-            ->rawValue('like_active');
     }
 }

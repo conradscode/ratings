@@ -16,22 +16,11 @@
                     @endif
                     <a href="{{ route('location.show', $location) }}"
                        class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">View</a>
-                    @if(isset($location->like_active))
-                        <form action="{{ route('likes.update',
-                              [
-                                  'locationId' => $location->id,
-                                  'likeActive' => $location->like_active ? 0 : 1
-                              ]) }}"
-                              method="POST">
+                    @if ($location->liked_by_current_user)
+                        <form action="{{ route('likes.destroy', ['locationId' => $location->id]) }}" method="POST">
                             @csrf
-                            @method('PATCH')
-                            <button class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">
-                                @if($location->like_active == 1)
-                                    Unlike
-                                @else
-                                    Like
-                                @endif
-                            </button>
+                            @method('DELETE')
+                            <button class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">Unlike</button>
                         </form>
                     @else
                         <form action="{{ route('likes.store', ['locationId' => $location->id]) }}" method="POST">

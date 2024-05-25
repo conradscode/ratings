@@ -7,7 +7,6 @@ use App\Models\Like;
 use App\Models\Location;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class LikeTest extends TestCase
@@ -15,7 +14,6 @@ class LikeTest extends TestCase
     use RefreshDatabase;
     const LOCATION_ID = 3;
     const LOCATION_TWO_ID = 55;
-    const LOCATION_THREE_ID = 3030;
     const USER_ID = 1;
 
     private User $user;
@@ -33,12 +31,9 @@ class LikeTest extends TestCase
         ]);
 
         $this->createLocation(self::LOCATION_ID, self::USER_ID);
-        $this->createLike(self::LOCATION_ID, self::USER_ID, 1);
+        $this->createLike(self::LOCATION_ID, self::USER_ID);
 
         $this->createLocation(self::LOCATION_TWO_ID, self::USER_ID);
-        $this->createLike(self::LOCATION_TWO_ID, self::USER_ID, 0);
-
-        $this->createLocation(self::LOCATION_THREE_ID, self::USER_ID);
     }
 
     public function test_like_exists_returns_true_if_like_found(): void
@@ -49,95 +44,16 @@ class LikeTest extends TestCase
 
     public function test_like_exists_returns_false_if_no_like_found(): void
     {
-        $this->assertFalse($this->likeController->likeExists(self::LOCATION_THREE_ID));
+        $this->actingAs($this->user);
+        $this->assertFalse($this->likeController->likeExists(self::LOCATION_TWO_ID));
     }
 
-    public function test_likes_count_returns_active_likes(): void
+    public function test_likes_count_returns_correct_count(): void
     {
         $this->assertEquals(1, $this->likeController->getLikesCount(self::LOCATION_ID));
     }
 
-    public function test_likes_count_doesnt_return_inactive_likes(): void
-    {
-        $this->actingAs($this->user);
-        $this->assertEquals(0, $this->likeController->getLikesCount(self::LOCATION_TWO_ID));
-    }
-
-    public function test_get_like_active_returns_true(): void
-    {
-        $this->actingAs($this->user);
-        $this->assertEquals(1, $this->likeController->getLikeActive(self::LOCATION_ID));
-    }
-
-    public function test_get_like_active_returns_false(): void
-    {
-        $this->actingAs($this->user);
-        $this->assertEquals(0, $this->likeController->getLikeActive(self::LOCATION_TWO_ID));
-    }
-
-    public function test_like_can_be_made_inactive(): void
-    {
-        $this->freezeTime(function (Carbon $time) {
-            $response = $this
-                ->actingAs($this->user)
-                ->from('/location')
-                ->patch('/likes/'.self::LOCATION_ID.'/0');
-
-            $response
-                ->assertSessionHasNoErrors()
-                ->assertRedirect('/location');
-
-            $this->assertDatabaseHas('likes', [
-                '_fk_user' => self::USER_ID,
-                '_fk_location' => self::LOCATION_ID,
-                'like_active' => 0,
-                'created_at' => '2024-05-12 07:05:00',
-                'updated_at' => $time,
-            ]);
-        });
-    }
-
-    public function test_like_can_be_made_active(): void
-    {
-        $this->freezeTime(function (Carbon $time) {
-            $response = $this
-                ->actingAs($this->user)
-                ->from('/location')
-                ->patch('/likes/'.self::LOCATION_TWO_ID.'/1');
-
-            $response
-                ->assertSessionHasNoErrors()
-                ->assertRedirect('/location');
-
-            $this->assertDatabaseHas('likes', [
-                '_fk_user' => self::USER_ID,
-                '_fk_location' => self::LOCATION_TWO_ID,
-                'like_active' => 1,
-                'created_at' => '2024-05-12 07:05:00',
-                'updated_at' => $time,
-            ]);
-        });
-    }
-
     public function test_like_can_be_created(): void
-    {
-        $response = $this
-            ->actingAs($this->user)
-            ->from('/location')
-            ->post('/likes/'.self::LOCATION_THREE_ID);
-
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/location');
-
-        $this->assertDatabaseHas('likes', [
-            '_fk_user' => self::USER_ID,
-            '_fk_location' => self::LOCATION_THREE_ID,
-            'like_active' => 1,
-        ]);
-    }
-
-    public function test_like_isnt_created_if_it_already_exists(): void
     {
         $response = $this
             ->actingAs($this->user)
@@ -148,12 +64,53 @@ class LikeTest extends TestCase
             ->assertSessionHasNoErrors()
             ->assertRedirect('/location');
 
-        $this->assertDatabaseMissing('likes', [
+        $this->assertDatabaseHas('likes', [
             '_fk_user' => self::USER_ID,
             '_fk_location' => self::LOCATION_TWO_ID,
-            'like_active' => 1,
         ]);
+    }
 
+    public function test_like_is_not_created_if_it_already_exists(): void
+    {
+        $response = $this
+            ->actingAs($this->user)
+            ->from('/location')
+            ->post('/likes/'.self::LOCATION_ID);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/location');
+
+        $this->assertDatabaseCount('likes', 1);
+    }
+
+    public function test_user_is_redirected_if_like_does_not_exist(): void
+    {
+        $response = $this
+            ->actingAs($this->user)
+            ->from('/location')
+            ->delete('/likes/'.self::LOCATION_TWO_ID);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/location');
+    }
+
+    public function test_like_can_be_deleted(): void
+    {
+        $response = $this
+            ->actingAs($this->user)
+            ->from('/location')
+            ->delete('/likes/'.self::LOCATION_ID);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/location');
+
+        $this->assertDatabaseMissing('likes',[
+            '_fk_user' => self::USER_ID,
+            '_fk_location' => self::LOCATION_ID
+        ]);
     }
 
     public function createLocation(int $locationId, $userId): void
@@ -169,12 +126,11 @@ class LikeTest extends TestCase
         ]);
     }
 
-    public function createLike(int $locationId, int $userId, int $likeActive): void
+    public function createLike(int $locationId, int $userId): void
     {
         Like::factory()->create([
             '_fk_user' => $userId,
             '_fk_location' => $locationId,
-            'like_active' => $likeActive,
             'created_at' => '2024-05-12 07:05:00',
             'updated_at' => '2024-05-12 07:05:00',
         ]);
