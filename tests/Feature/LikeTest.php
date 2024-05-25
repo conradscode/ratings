@@ -113,6 +113,19 @@ class LikeTest extends TestCase
         ]);
     }
 
+    public function test_show_displays_likes(): void
+    {
+        $response = $this
+            ->actingAs($this->user)
+            ->from('/location')
+            ->get('/likes/'.self::LOCATION_ID);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertSee($this->user->name)
+            ->assertSee($this->user->id);
+    }
+
     public function createLocation(int $locationId, $userId): void
     {
         Location::factory()->create([

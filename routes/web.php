@@ -14,6 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::controller(LikeController::class)->group(function () {
     Route::post('/likes/{locationId}', 'store')->name('likes.store');
     Route::delete('/likes/{locationId}', 'destroy')->name('likes.destroy');
+    Route::get('likes/{locationId}', 'show')->name('likes.show');
 });
 
 Route::middleware('auth')->group(function () {
