@@ -1,0 +1,24 @@
+[1mdiff --git a/tests/Feature/LikeTest.php b/tests/Feature/LikeTest.php[m
+[1mindex b83fa73..781bc3e 100644[m
+[1m--- a/tests/Feature/LikeTest.php[m
+[1m+++ b/tests/Feature/LikeTest.php[m
+[36m@@ -113,6 +113,19 @@[m [mpublic function test_like_can_be_deleted(): void[m
+         ]);[m
+     }[m
+ [m
+[32m+[m[32m    public function test_show_displays_likes(): void[m
+[32m+[m[32m    {[m
+[32m+[m[32m        $response = $this[m
+[32m+[m[32m            ->actingAs($this->user)[m
+[32m+[m[32m            ->from('/location')[m
+[32m+[m[32m            ->get('/likes/'.self::LOCATION_ID);[m
+[32m+[m
+[32m+[m[32m        $response[m
+[32m+[m[32m            ->assertSessionHasNoErrors()[m
+[32m+[m[32m            ->assertSee($this->user->name)[m
+[32m+[m[32m            ->assertSee($this->user->id);[m
+[32m+[m[32m    }[m
+[32m+[m
+     public function createLocation(int $locationId, $userId): void[m
+     {[m
+         Location::factory()->create([[m
