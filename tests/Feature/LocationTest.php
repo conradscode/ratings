@@ -76,10 +76,10 @@ class LocationTest extends TestCase
             ->actingAs($this->user)
             ->get('/location/' . $location->id);
 
-        $response->assertStatus(200);
-        $response->assertSee($location->name);
-        $response->assertSee($location->description);
-        $response->assertSee($location->rating);
+        $response->assertStatus(200)
+            ->assertSee($location->name)
+            ->assertSee($location->description)
+            ->assertSee($location->rating);
     }
 
     public function test_edit_does_not_load_if_correct_user_not_authenticated(): void
@@ -97,10 +97,10 @@ class LocationTest extends TestCase
         $response = $this
             ->actingAs($this->user)
             ->get('/location/' . $location->id . '/edit');
-        $response->assertStatus(200);
-        $response->assertSee($location->name);
-        $response->assertSee($location->description);
-        $response->assertSee($location->rating);
+        $response->assertStatus(200)
+            ->assertSee($location->name)
+            ->assertSee($location->description)
+            ->assertSee($location->rating);
     }
 
     public function test_update_aborts_if_correct_user_not_authenticated(): void
@@ -122,8 +122,8 @@ class LocationTest extends TestCase
             ->actingAs($this->user)
             ->put(route('location.update', $location), self::TEST_STORE_LOCATION_DETAILS);
 
-        $response->assertRedirect('/location/' . self::LOCATION_ID_FOR_TESTS);
-        $response->assertStatus(302);
+        $response->assertRedirect('/location/' . self::LOCATION_ID_FOR_TESTS)
+            ->assertStatus(302);
 
         $this->assertDatabaseHas('locations',
             [
