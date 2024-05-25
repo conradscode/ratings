@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Like;
 use App\Models\Location;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,11 +35,7 @@ class LocationTest extends TestCase
         ]);
 
         $this->createLocation(self::LOCATION_ID, self::USER_ID);
-        $this->createLike(self::LOCATION_ID, self::USER_ID, 1);
-
         $this->createLocation(self::LOCATION_TWO_ID, self::USER_ID);
-        $this->createLike(self::LOCATION_TWO_ID, self::USER_ID, 0);
-
         $this->createLocation(self::LOCATION_THREE_ID, self::USER_ID);
     }
 
@@ -165,7 +160,6 @@ class LocationTest extends TestCase
             ]);
     }
 
-
     public function createLocation(int $locationId, $userId): Location
     {
         return Location::factory()->create([
@@ -176,17 +170,6 @@ class LocationTest extends TestCase
             '_fk_user' => $userId,
             'created_at' => '2024-05-12 07:00:00',
             'updated_at' => '2024-05-12 07:00:00',
-        ]);
-    }
-
-    public function createLike(int $locationId, int $userId, int $likeActive): void
-    {
-        Like::factory()->create([
-            '_fk_user' => $userId,
-            '_fk_location' => $locationId,
-            'like_active' => $likeActive,
-            'created_at' => '2024-05-12 07:05:00',
-            'updated_at' => '2024-05-12 07:05:00',
         ]);
     }
 }
