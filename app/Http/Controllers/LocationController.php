@@ -51,6 +51,8 @@ class LocationController extends Controller
 
     public function show(Location $location)
     {
+        $location->likes = $this->likeController->getLikesCount($location->id);
+        $location->liked_by_current_user = $this->likeController->likeExists($location->id);
         return view('location.show', compact('location'));
     }
 
