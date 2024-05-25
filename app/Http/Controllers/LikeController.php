@@ -37,7 +37,7 @@ class LikeController extends Controller
                 'updated_at' => now()
             ]);
 
-        return to_route('location.index');
+        return back();
     }
 
     public function destroy(int $locationId): RedirectResponse
@@ -53,7 +53,7 @@ class LikeController extends Controller
             ])
             ->delete();
 
-        return to_route('location.index');
+        return back();
     }
 
     public function likeExists(int $locationId): bool
