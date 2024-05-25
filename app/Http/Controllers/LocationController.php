@@ -15,7 +15,7 @@ class LocationController extends Controller
     {
         $this->likeController = $likeController;
     }
-    
+
     public function index()
     {
         $locations = Location::query()

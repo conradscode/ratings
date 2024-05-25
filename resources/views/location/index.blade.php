@@ -29,13 +29,13 @@
                             <button class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full">Like</button>
                         </form>
                     @endif
-                    <div class="p-2">
+                    <a class="p-2" href="{{ route('likes.show', ['locationId' => $location->id]) }}">
                         {{$location->likes}} @if($location->likes > 1 || $location->likes < 1)
                             Likes
                         @else
                             Like
                         @endif
-                    </div>
+                    </a>
                 </div>
             </div>
         @endforeach
