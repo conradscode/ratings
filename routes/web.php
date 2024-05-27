@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\LikeController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/location')->name('dashboard');

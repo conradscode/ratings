@@ -20,8 +20,8 @@ class LocationFactory extends Factory
         return [
             'name' => fake()->realText(25),
             'description' => fake()->realText(144),
-            'rating' => fake()->numberBetween(0,5),
-            '_fk_user' => fake()->numberBetween(1,10),
+            'rating' => fake()->numberBetween(0, 5),
+            '_fk_user' => fake()->numberBetween(1, 10),
         ];
     }
 }
