@@ -13,14 +13,19 @@ class LocationTest extends TestCase
     use RefreshDatabase;
 
     const LOCATION_ID = 3;
+
     const LOCATION_TWO_ID = 55;
+
     const LOCATION_THREE_ID = 3030;
+
     const USER_ID = 1;
+
     const TEST_STORE_LOCATION_DETAILS = [
         'name' => 'Test Location Name',
         'description' => 'Test Location Description',
         'rating' => 2,
     ];
+
     const LOCATION_ID_FOR_TESTS = 3993;
 
     private User $user;
@@ -32,7 +37,7 @@ class LocationTest extends TestCase
             'id' => self::USER_ID,
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'password' => bcrypt('password')
+            'password' => bcrypt('password'),
         ]);
 
         $this->createLocation(self::LOCATION_ID, self::USER_ID);
@@ -74,7 +79,7 @@ class LocationTest extends TestCase
         $location = $this->createLocation(self::LOCATION_ID_FOR_TESTS, self::USER_ID);
         $response = $this
             ->actingAs($this->user)
-            ->get('/location/' . $location->id);
+            ->get('/location/'.$location->id);
 
         $response->assertStatus(200)
             ->assertSee($location->name)
@@ -86,7 +91,7 @@ class LocationTest extends TestCase
     {
         $response = $this
             ->actingAs(User::factory()->create())
-            ->get('/location/' . self::LOCATION_ID . '/edit');
+            ->get('/location/'.self::LOCATION_ID.'/edit');
         $response->assertStatus(403);
     }
 
@@ -96,7 +101,7 @@ class LocationTest extends TestCase
 
         $response = $this
             ->actingAs($this->user)
-            ->get('/location/' . $location->id . '/edit');
+            ->get('/location/'.$location->id.'/edit');
         $response->assertStatus(200)
             ->assertSee($location->name)
             ->assertSee($location->description)
@@ -122,14 +127,14 @@ class LocationTest extends TestCase
             ->actingAs($this->user)
             ->put(route('location.update', $location), self::TEST_STORE_LOCATION_DETAILS);
 
-        $response->assertRedirect('/location/' . self::LOCATION_ID_FOR_TESTS)
+        $response->assertRedirect('/location/'.self::LOCATION_ID_FOR_TESTS)
             ->assertStatus(302);
 
         $this->assertDatabaseHas('locations',
             [
                 'id' => self::LOCATION_ID_FOR_TESTS,
                 '_fk_user' => self::USER_ID,
-                ...self::TEST_STORE_LOCATION_DETAILS
+                ...self::TEST_STORE_LOCATION_DETAILS,
             ]);
     }
 
@@ -166,7 +171,7 @@ class LocationTest extends TestCase
         $location = $this->createLocation(self::LOCATION_ID_FOR_TESTS, self::USER_ID);
         Like::factory()->create([
             '_fk_location' => self::LOCATION_ID_FOR_TESTS,
-            '_fk_user' => self::USER_ID
+            '_fk_user' => self::USER_ID,
         ]);
         $response = $this
             ->actingAs($this->user)
@@ -177,7 +182,7 @@ class LocationTest extends TestCase
         $this->assertDatabaseMissing('likes',
             [
                 '_fk_location' => self::LOCATION_ID_FOR_TESTS,
-                '_fk_user' => self::USER_ID
+                '_fk_user' => self::USER_ID,
             ]);
         $this->assertDatabaseMissing('locations',
             [

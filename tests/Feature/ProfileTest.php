@@ -11,6 +11,7 @@ class ProfileTest extends TestCase
     use RefreshDatabase;
 
     const TEST_USER_ID = 3;
+
     const TEST_USER_NAME = 'Test User';
 
     public function test_profile_page_is_displayed(): void
@@ -113,7 +114,7 @@ class ProfileTest extends TestCase
     {
         $user = User::factory()->create([
             'name' => self::TEST_USER_NAME,
-            'id' => self::TEST_USER_ID
+            'id' => self::TEST_USER_ID,
         ]);
 
         $response = $this

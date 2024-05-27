@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class LocationController extends Controller
 {
     protected LikeController $likeController;
+
     protected ProfileController $profileController;
 
     public function __construct(
@@ -48,6 +49,7 @@ class LocationController extends Controller
 
         $location['_fk_user'] = Auth::id();
         $location = Location::query()->create($location);
+
         return to_route('location.show', $location)
             ->with('message', 'Location created successfully.');
     }
@@ -61,15 +63,16 @@ class LocationController extends Controller
 
     public function edit(Location $location)
     {
-        if (!$this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
+        if (! $this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
             abort(403);
         }
+
         return view('location.edit', compact('location'));
     }
 
     public function update(Request $request, Location $location): RedirectResponse
     {
-        if (!$this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
+        if (! $this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
             abort(403);
         }
 
@@ -80,12 +83,13 @@ class LocationController extends Controller
         ]);
 
         $location->update($request);
+
         return to_route('location.show', $location);
     }
 
     public function destroy(Location $location): RedirectResponse
     {
-        if (!$this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
+        if (! $this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
             abort(403);
         }
 

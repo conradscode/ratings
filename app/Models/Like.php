@@ -10,6 +10,6 @@ class Like extends Model
     use HasFactory;
 
     protected $fillable = [
-        '_fk_user', '_fk_location'
+        '_fk_user', '_fk_location',
     ];
 }

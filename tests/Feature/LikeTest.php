@@ -12,11 +12,15 @@ use Tests\TestCase;
 class LikeTest extends TestCase
 {
     use RefreshDatabase;
+
     const LOCATION_ID = 3;
+
     const LOCATION_TWO_ID = 55;
+
     const USER_ID = 1;
 
     private User $user;
+
     private LikeController $likeController;
 
     public function setUp(): void
@@ -27,7 +31,7 @@ class LikeTest extends TestCase
             'id' => self::USER_ID,
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'password' => bcrypt('password')
+            'password' => bcrypt('password'),
         ]);
 
         $this->createLocation(self::LOCATION_ID, self::USER_ID);
@@ -107,9 +111,9 @@ class LikeTest extends TestCase
             ->assertSessionHasNoErrors()
             ->assertRedirect('/location');
 
-        $this->assertDatabaseMissing('likes',[
+        $this->assertDatabaseMissing('likes', [
             '_fk_user' => self::USER_ID,
-            '_fk_location' => self::LOCATION_ID
+            '_fk_location' => self::LOCATION_ID,
         ]);
     }
 

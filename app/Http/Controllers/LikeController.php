@@ -22,6 +22,7 @@ class LikeController extends Controller
 
         return view('likes.show', compact('users'));
     }
+
     public function store(int $locationId): RedirectResponse
     {
         if ($this->likeExists($locationId)) {
@@ -34,7 +35,7 @@ class LikeController extends Controller
                 '_fk_location' => $locationId,
                 '_fk_user' => Auth::id(),
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ]);
 
         return back();
@@ -42,7 +43,7 @@ class LikeController extends Controller
 
     public function destroy(int $locationId): RedirectResponse
     {
-        if (!$this->likeExists($locationId)) {
+        if (! $this->likeExists($locationId)) {
             return to_route('location.index');
         }
 
