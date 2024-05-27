@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +20,20 @@ class ProfileController extends Controller
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
+    }
+
+    public function show(int $userId): View
+    {
+        $user = User::query()
+            ->select(['id', 'name'])
+            ->where('id', $userId)
+            ->first();
+
+        if ($user === null) {
+            abort(404);
+        }
+
+        return view('profile.show', compact('user'));
     }
 
     /**
