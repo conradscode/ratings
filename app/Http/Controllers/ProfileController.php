@@ -24,10 +24,7 @@ class ProfileController extends Controller
 
     public function show(int $userId): View
     {
-        $user = User::query()
-            ->select(['id', 'name'])
-            ->where('id', $userId)
-            ->first();
+        $user = $this->getUserDetailsById($userId);
 
         if ($user === null) {
             abort(404);
@@ -71,5 +68,12 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function getUserDetailsById(int $userId) {
+        return User::query()
+            ->select(['id', 'name'])
+            ->where('id', $userId)
+            ->first();
     }
 }

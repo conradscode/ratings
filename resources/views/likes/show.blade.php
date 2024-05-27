@@ -3,8 +3,8 @@
         <a href="/" class="bg-sky-500 text-white font-bold p-1.5 rounded-full float-right">Return Home</a>
         <div class="text-xl pb-2 ">Users who like this location</div>
         @foreach($users as $user)
-            <div>
-                <a href="{{ route('profile.show', $user->id) }}" class="text-md">{{ $user->name }}</a>
+            <div class="underline text-sky-500">
+                <a href="{{ route('profile.show', $user->id) }}">{{ $user->name }}</a>
             </div>
         @endforeach
     </div>
