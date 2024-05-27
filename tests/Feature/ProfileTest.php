@@ -10,6 +10,9 @@ class ProfileTest extends TestCase
 {
     use RefreshDatabase;
 
+    const TEST_USER_ID = 3;
+    const TEST_USER_NAME = 'Test User';
+
     public function test_profile_page_is_displayed(): void
     {
         $user = User::factory()->create();
@@ -28,7 +31,7 @@ class ProfileTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->patch('/profile', [
-                'name' => 'Test User',
+                'name' => self::TEST_USER_NAME,
                 'email' => 'test@example.com',
             ]);
 
@@ -38,7 +41,7 @@ class ProfileTest extends TestCase
 
         $user->refresh();
 
-        $this->assertSame('Test User', $user->name);
+        $this->assertSame(self::TEST_USER_NAME, $user->name);
         $this->assertSame('test@example.com', $user->email);
         $this->assertNull($user->email_verified_at);
     }
@@ -50,7 +53,7 @@ class ProfileTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->patch('/profile', [
-                'name' => 'Test User',
+                'name' => self::TEST_USER_NAME,
                 'email' => $user->email,
             ]);
 
@@ -95,5 +98,31 @@ class ProfileTest extends TestCase
             ->assertRedirect('/profile');
 
         $this->assertNotNull($user->fresh());
+    }
+
+    public function test_show_errors_if_user_not_found(): void
+    {
+        $response = $this
+            ->actingAs(User::factory()->create())
+            ->get('/profile/494949');
+
+        $response->assertNotFound();
+    }
+
+    public function test_shows_correct_user(): void
+    {
+        $user = User::factory()->create([
+            'name' => self::TEST_USER_NAME,
+            'id' => self::TEST_USER_ID
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->get('/profile/'.self::TEST_USER_ID);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertSee(self::TEST_USER_ID)
+            ->assertSee(self::TEST_USER_NAME);
     }
 }

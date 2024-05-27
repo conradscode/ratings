@@ -10,10 +10,14 @@ use Illuminate\Support\Facades\Auth;
 class LocationController extends Controller
 {
     protected LikeController $likeController;
+    protected ProfileController $profileController;
 
-    public function __construct(LikeController $likeController)
-    {
+    public function __construct(
+        LikeController $likeController,
+        ProfileController $profileController
+    ) {
         $this->likeController = $likeController;
+        $this->profileController = $profileController;
     }
 
     public function index()
@@ -23,8 +27,7 @@ class LocationController extends Controller
             ->paginate(5);
 
         foreach ($locations as $location) {
-            $location->likes = $this->likeController->getLikesCount($location->id);
-            $location->liked_by_current_user = $this->likeController->likeExists($location->id);
+            $this->getAdditionalLocationProperties($location);
         }
 
         return view('location.index', compact('locations'));
@@ -51,8 +54,8 @@ class LocationController extends Controller
 
     public function show(Location $location)
     {
-        $location->likes = $this->likeController->getLikesCount($location->id);
-        $location->liked_by_current_user = $this->likeController->likeExists($location->id);
+        $this->getAdditionalLocationProperties($location);
+
         return view('location.show', compact('location'));
     }
 
@@ -96,5 +99,14 @@ class LocationController extends Controller
     public function isUserAuthenticated(int $fkUser): bool
     {
         return $fkUser == Auth::id();
+    }
+
+    public function getAdditionalLocationProperties(Location $location): Location
+    {
+        $location->likes = $this->likeController->getLikesCount($location->id);
+        $location->liked_by_current_user = $this->likeController->likeExists($location->id);
+        $location->posted_user = $this->profileController->getUserDetailsById($location->_fk_user);
+
+        return $location;
     }
 }
