@@ -70,7 +70,8 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    public function getUserDetailsById(int $userId) {
+    public function getUserDetailsById(int $userId)
+    {
         return User::query()
             ->select(['id', 'name'])
             ->where('id', $userId)
