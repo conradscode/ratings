@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +20,17 @@ class ProfileController extends Controller
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
+    }
+
+    public function show(int $userId): View
+    {
+        $user = $this->getUserDetailsById($userId);
+
+        if ($user === null) {
+            abort(404);
+        }
+
+        return view('profile.show', compact('user'));
     }
 
     /**
@@ -56,5 +68,13 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function getUserDetailsById(int $userId)
+    {
+        return User::query()
+            ->select(['id', 'name'])
+            ->where('id', $userId)
+            ->first();
     }
 }
