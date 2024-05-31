@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
@@ -22,6 +23,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/{userId}', [ProfileController::class, 'show'])->name('profile.show');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::post('/follow/{userId}', [FollowController::class, 'store'])->name('follow.store');
+    Route::delete('/follow/{userId}', [FollowController::class, 'destroy'])->name('follow.destroy');
 });
 
 require __DIR__.'/auth.php';
