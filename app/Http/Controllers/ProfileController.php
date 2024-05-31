@@ -12,6 +12,13 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    protected FollowController $followController;
+
+    public function __construct(
+        FollowController $followController,
+    ) {
+        $this->followController = $followController;
+    }
     /**
      * Display the user's profile form.
      */
@@ -72,9 +79,13 @@ class ProfileController extends Controller
 
     public function getUserDetailsById(int $userId)
     {
-        return User::query()
+        $user = User::query()
             ->select(['id', 'name'])
             ->where('id', $userId)
             ->first();
+
+        $user->follow_exists = $this->followController->followExists($userId);
+
+        return $user;
     }
 }

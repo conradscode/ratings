@@ -11,6 +11,26 @@
                     >Edit Profile
                     </button>
                 </form>
+            @else
+                @if($user->follow_exists)
+                    <form action="{{ route('follow.destroy', $user->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full"
+                                href="{{ route('follow.destroy', $user->id) }}">
+                            Unfollow
+                        </button>
+                    </form>
+                @else
+                    <form action="{{ route('follow.store', $user->id) }}" method="POST">
+                        @csrf
+                        @method('POST')
+                        <button class="bg-sky-500 text-white font-bold py-2 px-4 rounded-full"
+                                href="{{ route('follow.store', $user->id) }}">
+                            Follow
+                        </button>
+                    </form>
+                @endif
             @endif
         </div>
     </div>
