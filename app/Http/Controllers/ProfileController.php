@@ -16,9 +16,11 @@ class ProfileController extends Controller
 
     public function __construct(
         FollowController $followController,
-    ) {
+    )
+    {
         $this->followController = $followController;
     }
+
     /**
      * Display the user's profile form.
      */
@@ -84,8 +86,10 @@ class ProfileController extends Controller
             ->where('id', $userId)
             ->first();
 
-        $user->follow_exists = $this->followController->followExists($userId);
+        if (isset($user)) {
+            $user->follow_exists = $this->followController->followExists($userId);
+        }
 
-        return $user;
+        return $user ?? null;
     }
 }
