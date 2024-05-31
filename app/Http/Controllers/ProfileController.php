@@ -16,8 +16,7 @@ class ProfileController extends Controller
 
     public function __construct(
         FollowController $followController,
-    )
-    {
+    ) {
         $this->followController = $followController;
     }
 

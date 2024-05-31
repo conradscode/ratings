@@ -10,7 +10,7 @@ class FollowController extends Controller
 {
     public function store(int $userId): RedirectResponse
     {
-        if (!$this->followExists($userId)) {
+        if (! $this->followExists($userId)) {
             Follower::query()
                 ->insert([
                     '_fk_user' => Auth::id(),

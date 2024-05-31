@@ -26,8 +26,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-   Route::post('/follow/{userId}', [FollowController::class, 'store'])->name('follow.store');
-   Route::delete('/follow/{userId}', [FollowController::class, 'destroy'])->name('follow.destroy');
+    Route::post('/follow/{userId}', [FollowController::class, 'store'])->name('follow.store');
+    Route::delete('/follow/{userId}', [FollowController::class, 'destroy'])->name('follow.destroy');
 });
 
 require __DIR__.'/auth.php';

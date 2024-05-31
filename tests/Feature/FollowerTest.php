@@ -3,8 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Follower;
-use App\Models\Like;
-use App\Models\Location;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -34,17 +32,17 @@ class FollowerTest extends TestCase
         $response = $this
             ->from('/profile/'.$user2->id)
             ->actingAs($this->user)
-            ->post('/follow/'. $user2->id);
+            ->post('/follow/'.$user2->id);
 
         $response
             ->assertStatus(302)
             ->assertRedirect('/profile/'.$user2->id);
 
         $this->assertDatabaseHas('followers',
-        [
-            '_fk_user' => $this->user->id,
-            '_fk_user_followed' => $user2->id,
-        ]);
+            [
+                '_fk_user' => $this->user->id,
+                '_fk_user_followed' => $user2->id,
+            ]);
     }
 
     public function test_unfollowing_a_user(): void
@@ -58,7 +56,7 @@ class FollowerTest extends TestCase
         $response = $this
             ->from('/profile/'.$user2->id)
             ->actingAs($this->user)
-            ->delete('/follow/'. $user2->id);
+            ->delete('/follow/'.$user2->id);
 
         $response
             ->assertStatus(302)
