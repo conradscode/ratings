@@ -6,6 +6,7 @@ use App\Models\Location;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class LocationController extends Controller
 {
@@ -21,7 +22,7 @@ class LocationController extends Controller
         $this->profileController = $profileController;
     }
 
-    public function index()
+    public function index(): View
     {
         $locations = Location::query()
             ->orderBy('created_at', 'desc')
@@ -34,12 +35,12 @@ class LocationController extends Controller
         return view('location.index', compact('locations'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('location.create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $location = $request->validate([
             'name' => ['required', 'string', 'max:25'],
@@ -54,14 +55,14 @@ class LocationController extends Controller
             ->with('message', 'Location created successfully.');
     }
 
-    public function show(Location $location)
+    public function show(Location $location): View
     {
         $this->getAdditionalLocationProperties($location);
 
         return view('location.show', compact('location'));
     }
 
-    public function edit(Location $location)
+    public function edit(Location $location): View
     {
         if (! $this->isUserAuthenticated($location->getAttribute('_fk_user'))) {
             abort(403);
