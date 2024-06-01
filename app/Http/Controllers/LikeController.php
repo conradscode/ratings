@@ -6,10 +6,11 @@ use App\Models\Like;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class LikeController extends Controller
 {
-    public function show(int $locationId)
+    public function show(int $locationId): View
     {
         $usersIds = Like::query()
             ->where('_fk_location', $locationId)
